@@ -1,23 +1,21 @@
-
 version: 0.2
 
 phases:
   install:
-    runtime-versions:
-      docker: 20
     commands:
       - echo Installing Docker...
+      - nohup /usr/local/bin/dockerd-entrypoint.sh &   # Start Docker daemon
+      - timeout 15 sh -c "until docker info; do echo waiting for docker; sleep 2; done"
 
   pre_build:
     commands:
-      - echo Pre build phase
+      - echo Logging in to Amazon ECR...
+      - aws --version
 
   build:
     commands:
-      - echo Building Docker image
-      - docker build -t myapp .
-      - echo Running Docker container
-      - docker run -d myapp
+      - echo Build started on `date`
+      - docker build -t my-app .
 
   post_build:
     commands:
